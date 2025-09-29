@@ -1,8 +1,10 @@
 import PySimpleGUI as sg
 import string
-import generador_contraseñas as gc
-import json
-import manejo_datos as md
+import sys
+import os
+from Scripts.generador_contraseñas import generar_contraseña
+
+
 def Nombre_Contraseña():
     layout = [
         [sg.Text("Nombre"), sg.InputText(key="-NOMBRE-")],
@@ -31,4 +33,5 @@ def Nombre_Contraseña():
             window['-PASS-'].update(nueva_pass)
 
     window.close()
+exit()
 
