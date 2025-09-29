@@ -15,12 +15,13 @@ def generar_contraseña():
         elif event == 'Añadir' and len(values[1]) < 15:
             sg.popup("La contraseña debe tener al menos 15 caracteres")
         elif event == 'Añadir' and len(values[1]) >= 15:
-            with open("Contraseñas.json", "a") as f:
+            with open("Contraseñas.txt", "a") as f:
                 f.write(f"{values[0]}: {values[1]}\n")
-                # Añadir aqui lo de introducir a la base de datos
             sg.popup("Contraseña guardada correctamente")
             window.close()
             exit()
+        elif event == 'Generar Contraseña':
+            gc.generar_contraseña()
         event,values = window.read()
 
     window.close()
