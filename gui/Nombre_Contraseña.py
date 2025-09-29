@@ -36,9 +36,9 @@ def Nombre_Contraseña():
                 sg.popup("Contraseña guardada correctamente")
         elif event == 'Generar Contraseña':
             # Generar contraseña y mostrarla en el campo
-            nueva_pass = generar_contraseña()
+            nueva_pass = gc.generar_contraseña()
             window['-PASS-'].update(nueva_pass)
 
     window.close()
-Nombre_Contraseña()
 exit()
+
