@@ -1,8 +1,8 @@
 import PySimpleGUI as sg
 import string
-import sys
-import os
-from Scripts.generador_contraseñas import generar_contraseña
+import generador_contraseñas as gc
+import json
+import manejo_datos as md
 
 
 def Nombre_Contraseña():
