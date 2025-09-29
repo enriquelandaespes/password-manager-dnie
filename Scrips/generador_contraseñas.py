@@ -23,16 +23,9 @@ def crear_contraseña(longitud):
 
 # Pedimos al usuario que elija la longitud. Se recomienda 12 o más.
 def generar_contraseña():
-    try:
-
-        longitud_deseada = random.randint(15, 25)
-        
-        # Generamos la contraseña llamando a la función
-        contraseña_final = crear_contraseña(longitud_deseada)
-        
-        # Mostramos el resultado
-        print(f"\n✅ ¡Contraseña generada con éxito!")
-        print(f"Tu contraseña segura es: {contraseña_final} y tiene {longitud_deseada} caracteres.\n")
-
-    except ValueError:
-        print("\n❌ Error: Por favor, introduce un número válido.")
+    # Elegimos una longitud aleatoria entre 15 y 25
+    longitud_deseada = random.randint(15, 25)
+    
+    # Generamos la contraseña llamando a la función
+    contraseña_final = crear_contraseña(longitud_deseada)
+    return contraseña_final
