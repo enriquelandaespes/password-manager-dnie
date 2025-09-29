@@ -32,4 +32,3 @@ def Nombre_Contraseña():
 
     window.close()
 
-
