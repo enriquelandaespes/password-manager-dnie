@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import string
+import generador_contraseñas as gc
 
 def generar_contraseña():
     layout = [  [sg.Text("Nombre"), sg.InputText()],
