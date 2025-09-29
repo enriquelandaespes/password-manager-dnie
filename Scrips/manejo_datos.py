@@ -24,9 +24,10 @@ def agregar_contraseña(nombre, contraseña):
 
 # Listar usuarios
 def listar_usuarios():
+    #Cambiarla para llamarla en GUIU
     db = cargar_bd()
     for u in db["Contrasenas"]:
-        print(f"👤 {u['nombre']} - 🔑 {u['contrasena']}")
+        print(f" {u['nombre']} - {u['contrasena']}")
 
 # Buscar un usuario por nombre
 def buscar_usuario(nombre):
@@ -39,3 +40,4 @@ def eliminar_usuario(nombre):
     db = cargar_bd()
     db["Contrasenas"] = [u for u in db["Contrasenas"] if u["nombre"] != nombre]
     guardar_bd(db)
+
