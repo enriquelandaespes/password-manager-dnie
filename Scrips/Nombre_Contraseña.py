@@ -1,30 +1,35 @@
 import PySimpleGUI as sg
 import string
 import generador_contraseñas as gc
-
-def generar_contraseña():
-    layout = [  [sg.Text("Nombre"), sg.InputText()],
-                [sg.Text("Contraseña"), sg.InputText(), sg.Button('Generar Contraseña')],
-                [sg.Button('Añadir'), sg.Button('Cancelar')] ]
+import json
+import manejo_datos as md
+def Nombre_Contraseña():
+    layout = [
+        [sg.Text("Nombre"), sg.InputText(key="-NOMBRE-")],
+        [sg.Text("Contraseña"), sg.InputText(key="-PASS-"), sg.Button('Generar Contraseña')],
+        [sg.Button('Añadir'), sg.Button('Cancelar')]
+    ]
 
     window = sg.Window('Simple GUI', layout)
 
-    event,values = window.read()
-    while (event != sg.WIN_CLOSED or event != 'Cancelar'):
-        if values[0] == "" and event == 'Añadir':
-            sg.popup("El nombre no puede estar vacío")
-        elif event == 'Añadir' and len(values[1]) < 15:
-            sg.popup("La contraseña debe tener al menos 15 caracteres")
-        elif event == 'Añadir' and len(values[1]) >= 15:
-            with open("Contraseñas.txt", "a") as f:
-                f.write(f"{values[0]}: {values[1]}\n")
-            sg.popup("Contraseña guardada correctamente")
-            window.close()
-            exit()
+    while True:
+        event, values = window.read()
+        if event in (sg.WIN_CLOSED, 'Cancelar'):
+            break
+        if event == 'Añadir':
+            if values['-NOMBRE-'] == "":
+                sg.popup("El nombre no puede estar vacío")
+            elif len(values['-PASS-']) < 15:
+                sg.popup("La contraseña debe tener al menos 15 caracteres")
+            else:
+                # Cambiar aquí para generar el documento JSON en lugar de txt
+                md.agregar_contraseña(values['-NOMBRE-'], values['-PASS-'])
+                sg.popup("Contraseña guardada correctamente")
         elif event == 'Generar Contraseña':
-            gc.generar_contraseña()
-        event,values = window.read()
+            # Generar contraseña y mostrarla en el campo
+            nueva_pass = gc.generar_contraseña()
+            window['-PASS-'].update(nueva_pass)
 
     window.close()
-    exit()
+
 
