@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import font
 import detectar_dnie as det
-import Interfaz_Contraseñas as ic
+import verificar_dnie_gui as vdnie
 
 def detectar_dnie():
     # Create the main window
@@ -33,12 +33,9 @@ def mostrar_resultado(window,main_frame, subtitle_font):
     if(det.detectar_dnie()):
         status_label = tk.Label(main_frame, text="DNIe detectado correctamente.", font=subtitle_font, fg="green")
         status_label.pack(pady=10)
-        window.after(2000, lambda: [window.destroy(), ic.interfaz_contrasenas()])
+        window.after(2000, lambda: [window.destroy(), vdnie.verificar_dnie()])
     else:
         status_label = tk.Label(main_frame, text="No se ha detectado el DNIe.", font=subtitle_font, fg="red")
         status_label.pack(pady=10)
     spacer = tk.Label(main_frame, text="", height=2)
     spacer.pack()
-
-
-
