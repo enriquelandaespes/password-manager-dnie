@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import font
+import detectar_dnie_gui as detdniegui
 
 # Create the main window
 window = tk.Tk()
 window.title('Simple GUI')
-window.geometry('400x250')  # Set a window size for a better look
+window.geometry('600x250')  # Set a window size for a better look
 
 # Define a font for the title
 title_font = font.Font(family="Any", size=30, weight="bold")
@@ -26,7 +27,7 @@ button_frame.pack(pady=20)
 exit_button = tk.Button(button_frame, text='Salir', width=10, height=3, command=window.destroy)
 exit_button.pack(side=tk.LEFT, padx=10)
 
-access_button = tk.Button(button_frame, text='Acceder', width=10, height=3, command=lambda: exit())
+access_button = tk.Button(button_frame, text='Acceder', width=10, height=3, command=lambda: detdniegui.detectar_dnie())
 access_button.pack(side=tk.LEFT, padx=10)
 
 # Empty label for spacing, similar to sg.Text("", size=(1,2))
