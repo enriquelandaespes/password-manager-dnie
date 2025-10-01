@@ -39,3 +39,4 @@ def mostrar_resultado(window,main_frame, subtitle_font):
         status_label.pack(pady=10)
     spacer = tk.Label(main_frame, text="", height=2)
     spacer.pack()
+
