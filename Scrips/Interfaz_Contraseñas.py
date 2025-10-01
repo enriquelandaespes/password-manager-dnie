@@ -65,6 +65,3 @@ def interfaz_contrasenas():
     tk.Button(root, text="Nueva Contraseña", width=15, command=nueva_accion).grid(row=bottom_row, column=1, pady=10)
 
     root.mainloop()
-
-if __name__ == "__main__":
-    interfaz_contrasenas()
