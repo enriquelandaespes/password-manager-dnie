@@ -27,7 +27,7 @@ button_frame.pack(pady=20)
 exit_button = tk.Button(button_frame, text='Salir', width=10, height=3, command=window.destroy)
 exit_button.pack(side=tk.LEFT, padx=10)
 
-access_button = tk.Button(button_frame, text='Acceder', width=10, height=3, command=lambda: detdniegui.detectar_dnie())
+access_button = tk.Button(button_frame, text='Acceder', width=10, height=3, command=lambda:[window.destroy(), detdniegui.detectar_dnie()])
 access_button.pack(side=tk.LEFT, padx=10)
 
 # Empty label for spacing, similar to sg.Text("", size=(1,2))
@@ -40,3 +40,4 @@ subtitle_label.pack(side=tk.BOTTOM, anchor='e') # Anchors to the bottom and east
 
 # Start the main event loop
 window.mainloop()
+
