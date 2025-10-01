@@ -24,8 +24,8 @@ def crear_contraseña(longitud):
 # Pedimos al usuario que elija la longitud. Se recomienda 12 o más.
 def generar_contraseña():
     # Elegimos una longitud aleatoria entre 15 y 25
-    longitud_deseada = random.randint(15, 25)
-    
-    # Generamos la contraseña llamando a la función
-    contraseña_final = crear_contraseña(longitud_deseada)
-    return contraseña_final
+        longitud_deseada = random.randint(15, 25)
+        
+        # Generamos la contraseña llamando a la función
+        contraseña_final = crear_contraseña(longitud_deseada)
+        return contraseña_final
