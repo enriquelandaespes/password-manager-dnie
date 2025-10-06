@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import font
-import verificar_dnie as vdnie
 import Interfaz_Contraseñas as ic
 import manejo_datos as md
 
@@ -32,14 +31,15 @@ def verificar_dnie():
 
 def check_dnie(entry_pin,window,main_frame,subtitle_font):
     pin=entry_pin.get()
-    md.guardar_pin(pin)
+    ini=md.manejo_datos(pin)
     # Check if DNIe is verified
-    if(vdnie.verificar_dnie(pin)):
-      
+    if(ini.verificar_dnie(pin)):
         status_label = tk.Label(main_frame, text="DNIe verificado correctamente.", font=subtitle_font, fg="green")
         status_label.pack(pady=10)
-        window.after(2000, lambda: [window.destroy(), ic.interfaz_contrasenas()])
+        window.after(2000, lambda: [window.destroy(), ic.interfaz_contrasenas(ini)])
     else:
         status_label = tk.Label(main_frame, text="No se ha podido verificar el DNIe.", font=subtitle_font, fg="red")
         status_label.pack(pady=10)
+    
+
     
