@@ -3,7 +3,7 @@ from tkinter import messagebox
 import generador_contraseñas as gc
 import manejo_datos as md
 
-def Nombre_Contraseña():
+def Nombre_Contraseña(ini):
     def on_add():
         nombre = entry_nombre.get()
         password = entry_pass.get()
@@ -12,7 +12,7 @@ def Nombre_Contraseña():
         elif len(password) < 15:
             messagebox.showwarning("Error", "La contraseña debe tener al menos 15 caracteres")
         else:
-            a=md.agregar_contraseña(nombre, password)
+            a=ini.agregar_contraseña(nombre, password)
             if a:
                 messagebox.showinfo("Éxito", "Contraseña guardada correctamente")
             window.destroy()
