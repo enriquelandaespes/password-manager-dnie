@@ -1,10 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog
-import manejo_datos as md
 import Nombre_Contraseña
 import generador_contraseñas as gc
 
-def interfaz_contrasenas():
+def interfaz_contrasenas(ini):
     root = tk.Tk()
     root.title("Gestor de Contraseñas")
 
@@ -13,7 +12,7 @@ def interfaz_contrasenas():
     tk.Label(root, text="Contraseña", width=20, font=("Arial", 12, "bold")).grid(row=0, column=1, padx=5, pady=5)
     tk.Label(root, text="", width=40).grid(row=0, column=2, columnspan=3)
     
-    lista = md.cargar_bd().get("Contrasenas", [])
+    lista = ini.cargar_bd().get("Contrasenas", [])
 
     for idx, entrada in enumerate(lista, start=1):
         nombre = entrada["nombre"]
@@ -48,29 +47,29 @@ def interfaz_contrasenas():
                 new_name=entry_name.get()
                 new_pass=entry_pass.get()
                 if new_pass != actual and new_pass.strip() != "":
-                    md.editar_contraseña(nm,new_pass)
+                    ini.editar_contraseña(nm,new_pass)
                 if new_name != nm and new_name.strip != "":
-                    md.editar_nombre(nm,new_name)
+                    ini.editar_nombre(nm,new_name)
                 window.destroy()
-                interfaz_contrasenas()
+                interfaz_contrasenas(ini)
             tk.Button(window, text="Aceptar", width=10, command=aceptar).grid(row=3, column=2, padx=1, pady=3)
             window.mainloop()
         tk.Button(root, text="Editar", width=10, command=editar).grid(row=idx, column=4, padx=2)
         def generar_nueva(nm=nombre):
             nueva=gc.generar_contraseña()
-            md.editar_contraseña(nm,nueva)
+            ini.editar_contraseña(nm,nueva)
             root.destroy()
-            interfaz_contrasenas()
+            interfaz_contrasenas(ini)
         tk.Button(root, text="Generar Nueva", width=15, command=generar_nueva).grid(row=idx, column=5, padx=2)
 
       
 
         def borrar(nm=nombre):
             if messagebox.askyesno("Borrar", f"¿Seguro que deseas borrar la contraseña de {nm}?"):
-                md.eliminar_contraseña(nm)
+                ini.eliminar_contraseña(nm)
                 messagebox.showinfo("Eliminado", f"Contraseña de {nm} eliminada.")
                 root.destroy()
-                interfaz_contrasenas()
+                interfaz_contrasenas(ini)
 
         tk.Button(root, text="Borrar", width=10, command=borrar).grid(row=idx, column=6, padx=2)
         def copiar():
@@ -82,10 +81,10 @@ def interfaz_contrasenas():
 
     bottom_row = len(lista) + 1
 
-    def nueva_accion():
+    def nueva_accion(ini):
         root.destroy()
-        Nombre_Contraseña.Nombre_Contraseña()
-        interfaz_contrasenas()
+        Nombre_Contraseña.Nombre_Contraseña(ini)
+        interfaz_contrasenas(ini)
 
     tk.Button(root, text="Salir", width=15, command=root.destroy).grid(row=bottom_row, column=0, pady=10)
     tk.Button(root, text="Nueva Contraseña", width=15, command=nueva_accion).grid(row=bottom_row, column=1, pady=10)
@@ -93,5 +92,4 @@ def interfaz_contrasenas():
     root.mainloop()
 
 
-if __name__ == "__main__":
-    interfaz_contrasenas()
+
