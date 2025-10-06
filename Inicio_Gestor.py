@@ -1,44 +1,133 @@
-import tkinter as tk
-from tkinter import font
-import detectar_dnie_gui as detdniegui
+import pygame
+import sys
+# Suponiendo que este archivo sigue existiendo para ser llamado
+import detectar_dnie_gui as detdniegui 
 
-# Create the main window
-window = tk.Tk()
-window.title('Simple GUI')
-window.geometry('600x250')  # Set a window size for a better look
+# --- Inicialización de Pygame ---
+pygame.init()
 
-# Define a font for the title
-title_font = font.Font(family="Any", size=30, weight="bold")
-subtitle_font = font.Font(family="Any", size=10, weight="bold")
+# --- Configuración de la Ventana ---
+WIDTH, HEIGHT = 600, 250
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Gestor de Contraseñas")
 
-# Create a frame for the main content to help with centering
-main_frame = tk.Frame(window)
-main_frame.pack(expand=True, fill='both', padx=10, pady=10)
+# --- Colores (estilo "superhero") ---
+COLOR_BG = (34, 38, 41)         # Fondo oscuro
+COLOR_TEXT = (239, 239, 239)    # Texto principal (casi blanco)
+COLOR_GRAY = (173, 181, 189)    # Texto secundario (gris)
+COLOR_SUCCESS = (25, 135, 84)   # Botón Acceder (verde)
+COLOR_DANGER = (220, 53, 69)    # Botón Salir (rojo)
+COLOR_SUCCESS_HOVER = (21, 115, 71) # Verde más oscuro al pasar el ratón
 
-# Title Label
-title_label = tk.Label(main_frame, text="Gestor de Contraseñas", font=title_font)
-title_label.pack(pady=10)
+# --- Fuentes ---
+try:
+    # Intenta usar una fuente moderna si está disponible
+    title_font = pygame.font.SysFont('Segoe UI Bold', 40)
+    button_font = pygame.font.SysFont('Segoe UI', 20)
+    subtitle_font = pygame.font.SysFont('Segoe UI', 12)
+except pygame.error:
+    # Usa la fuente por defecto si la otra no se encuentra
+    title_font = pygame.font.Font(None, 50)
+    button_font = pygame.font.Font(None, 30)
+    subtitle_font = pygame.font.Font(None, 18)
 
-# Frame for buttons to center them
-button_frame = tk.Frame(main_frame)
-button_frame.pack(pady=20)
+# --- Clase para los Botones ---
+class Button:
+    def __init__(self, x, y, width, height, text, color, hover_color=None):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.text = text
+        self.color = color
+        self.hover_color = hover_color if hover_color else color
+        self.is_hovered = False
 
-# Buttons
-exit_button = tk.Button(button_frame, text='Salir', width=10, height=3, command=window.destroy)
-exit_button.pack(side=tk.LEFT, padx=10)
+    def draw(self, surface):
+        # Elige el color basado en si el ratón está encima
+        current_color = self.hover_color if self.is_hovered else self.color
+        pygame.draw.rect(surface, current_color, self.rect, border_radius=5)
+        
+        # Dibuja el texto centrado en el botón
+        text_surf = button_font.render(self.text, True, COLOR_TEXT)
+        text_rect = text_surf.get_rect(center=self.rect.center)
+        surface.blit(text_surf, text_rect)
 
-access_button = tk.Button(button_frame, text='Acceder', width=10, height=3, command=lambda:[window.destroy(), detdniegui.detectar_dnie()])
-access_button.pack(side=tk.LEFT, padx=10)
+    def check_hover(self, mouse_pos):
+        self.is_hovered = self.rect.collidepoint(mouse_pos)
 
-# Empty label for spacing, similar to sg.Text("", size=(1,2))
-spacer = tk.Label(main_frame, text="", height=2)
-spacer.pack()
+    def is_clicked(self, event):
+        return event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_hovered
 
-# Subtitle Label
-subtitle_label = tk.Label(main_frame, text="by Enrique Landa y Ruben Sanz", font=subtitle_font, fg="gray")
-subtitle_label.pack(side=tk.BOTTOM, anchor='e') # Anchors to the bottom and east (right)
+# --- Creación de Elementos de la UI ---
+# Título y subtítulo
+title_surf = title_font.render("Gestor de Contraseñas", True, COLOR_TEXT)
+title_rect = title_surf.get_rect(center=(WIDTH // 2, HEIGHT // 3))
 
-# Start the main event loop
-window.mainloop()
+subtitle_surf = subtitle_font.render("by Enrique Landa y Ruben Sanz", True, COLOR_GRAY)
+subtitle_rect = subtitle_surf.get_rect(bottomright=(WIDTH - 10, HEIGHT - 10))
 
+# Botones
+button_width, button_height = 120, 50
+button_y = HEIGHT // 2 + 20
+spacing = 30
 
+exit_button = Button(
+    WIDTH // 2 - button_width - spacing // 2, 
+    button_y, 
+    button_width, 
+    button_height, 
+    'Salir', 
+    COLOR_DANGER
+)
+
+access_button = Button(
+    WIDTH // 2 + spacing // 2, 
+    button_y, 
+    button_width, 
+    button_height, 
+    'Acceder', 
+    COLOR_SUCCESS, 
+    COLOR_SUCCESS_HOVER
+)
+
+buttons = [exit_button, access_button]
+
+# --- Bucle Principal del "Juego" ---
+running = True
+while running:
+    # --- Manejo de Eventos ---
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        
+        # Comprobar si un botón ha sido pulsado
+        if exit_button.is_clicked(event):
+            running = False # Salir del bucle
+        
+        if access_button.is_clicked(event):
+            # Cierra la ventana de Pygame y lanza la siguiente GUI de ttkbootstrap
+            pygame.quit() 
+            detdniegui.detectar_dnie() 
+            # Como la siguiente ventana no es Pygame, salimos del script
+            sys.exit()
+
+    # --- Lógica de Actualización ---
+    mouse_pos = pygame.mouse.get_pos()
+    for button in buttons:
+        button.check_hover(mouse_pos)
+
+    # --- Dibujado en Pantalla ---
+    screen.fill(COLOR_BG) # Limpia la pantalla con el color de fondo
+
+    # Dibuja el texto
+    screen.blit(title_surf, title_rect)
+    screen.blit(subtitle_surf, subtitle_rect)
+
+    # Dibuja los botones
+    for button in buttons:
+        button.draw(screen)
+
+    # Actualiza la pantalla para mostrar lo que se ha dibujado
+    pygame.display.flip()
+
+# --- Salida Limpia ---
+pygame.quit()
+sys.exit()
