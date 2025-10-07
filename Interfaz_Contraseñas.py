@@ -116,17 +116,37 @@ def edit_entry_screen(screen, ini, entry, notify_callback):
             if btn_aceptar.is_clicked(event):
                 new_name = input_nombre.text.strip()
                 new_pass = input_pass.text.strip()
+                
+                # --- Validaciones ---
                 if new_name == "":
-                    show_local_notification("Nombre no puede estar vacío",error=True)
+                    show_local_notification("El nombre no puede estar vacío", error=True)
                     continue
-                if len(new_pass)<15:
-                    show_local_notification("Contraseña debe tener al menos 15 caracteres",error=True)
+                if len(new_pass) < 15:
+                    show_local_notification("La contraseña debe tener al menos 15 caracteres", error=True)
                     continue
-                ini.editar_contraseña(entry['nombre'], new_pass)
-                if new_name!=entry['nombre']: ini.editar_nombre(entry['nombre'],new_name)
-                show_local_notification("Entrada actualizada correctamente")
-                notify_callback("Entrada actualizada correctamente")
-                edit_running=False
+
+                # --- Lógica de Actualización Corregida ---
+                nombre_ha_cambiado = (new_name != entry['nombre'])
+                actualizacion_exitosa = True # Suponemos que todo irá bien
+
+                if nombre_ha_cambiado:
+                    # Si el nombre cambia, intentamos actualizarlo PRIMERO
+                    if not ini.editar_nombre(entry['nombre'], new_name):
+                        # Si editar_nombre devuelve False (porque ya existe), mostramos error
+                        show_local_notification("Ese nombre ya existe. No se ha actualizado.", error=True)
+                        actualizacion_exitosa = False
+                    else:
+                        # Si el cambio de nombre tuvo éxito, actualizamos la contraseña en la entrada con el NUEVO nombre
+                        ini.editar_contraseña(new_name, new_pass)
+                else:
+                    # Si el nombre no ha cambiado, solo actualizamos la contraseña
+                    ini.editar_contraseña(entry['nombre'], new_pass)
+
+                if actualizacion_exitosa:
+                    # Solo si todo fue bien, mostramos el mensaje de éxito y cerramos
+                    show_local_notification("Entrada actualizada correctamente")
+                    notify_callback("Entrada actualizada correctamente")
+                    edit_running = False
 
         # Fondo de edición semitransparente
         screen.fill((34,38,41))
