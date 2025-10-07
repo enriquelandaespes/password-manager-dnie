@@ -182,9 +182,9 @@ def iniciar_verificacion():
     
     pygame.quit()
     if dnie_instance:
-        dnie_instance.inicializar_clave()
         ic.interfaz_contrasenas(dnie_instance)
     sys.exit()
 
 if __name__ == "__main__":
     iniciar_verificacion()
+
