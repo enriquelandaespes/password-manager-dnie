@@ -4,7 +4,6 @@ import time
 import detectar_dnie as det
 import verificar_dnie_gui as vdnie
 
-# Se mantiene el nombre original de la función para compatibilidad
 def detectar_dnie():
     # --- Inicialización de Pygame ---
     pygame.init()
@@ -31,8 +30,8 @@ def detectar_dnie():
     bar_y = HEIGHT // 2 + 40
     bar_bg_rect = pygame.Rect(bar_x, bar_y, BAR_WIDTH, BAR_HEIGHT)
 
-    # --- MODIFICADO: Constante para el tiempo de espera ---
-    WAIT_SECONDS = 1.0 # Reducido de 2.0 a 1.0
+    # --- Constante para el tiempo de espera ---
+    WAIT_SECONDS = 1.0 
 
     # --- Variables de estado ---
     start_time = time.time()
@@ -50,7 +49,6 @@ def detectar_dnie():
 
         current_time = time.time()
 
-        # MODIFICADO: Fase 1 ahora usa WAIT_SECONDS
         if detection_result is None and (current_time - start_time) > WAIT_SECONDS:
             if det.detectar_dnie():
                 detection_result = True
@@ -62,7 +60,6 @@ def detectar_dnie():
                 status_message = "No se ha detectado el DNIe."
                 status_color = COLOR_DANGER
 
-        # MODIFICADO: Fase 2 ahora usa WAIT_SECONDS
         if transition_time and (current_time - transition_time) > WAIT_SECONDS:
             running = False
 
@@ -74,7 +71,7 @@ def detectar_dnie():
         pygame.draw.rect(screen, COLOR_INACTIVE, bar_bg_rect, 2, border_radius=5)
 
         if detection_result is None:
-            # MODIFICADO: La animación ahora dura WAIT_SECONDS
+            
             elapsed = current_time - start_time
             progress = min(elapsed / WAIT_SECONDS, 1.0)
             
