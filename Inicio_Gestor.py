@@ -1,37 +1,38 @@
 import pygame
 import sys
-import time # Necesario para la animación
+import time 
 import detectar_dnie_gui as detdniegui 
 
-# --- Inicialización de Pygame ---
+# Inicialización de Pygame, para la interfaz del programa
 pygame.init()
 
-# --- Configuración de la Ventana ---
+# Configuración de la Ventana
 WIDTH, HEIGHT = 600, 300
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Gestor de Contraseñas")
 
-# --- Colores ---
+# Colores de la ventana y botones tal y como especifica la libreria 
 COLOR_BG = (34, 38, 41)
 COLOR_TEXT = (239, 239, 239)
 COLOR_GRAY = (173, 181, 189)
 COLOR_SUCCESS = (25, 135, 84)
 COLOR_DANGER = (220, 53, 69)
 COLOR_SUCCESS_HOVER = (21, 115, 71)
-COLOR_DANGER_HOVER = (187, 45, 59) # Color hover para el botón de salir
-COLOR_BORDER = (52, 58, 64)      # Color del borde de los botones
+COLOR_DANGER_HOVER = (187, 45, 59) 
+COLOR_BORDER = (52, 58, 64)    
 
-# --- Fuentes ---
+# Fuentes que aparecen en la ventana
 try:
     title_font = pygame.font.SysFont('Segoe UI Bold', 40)
     button_font = pygame.font.SysFont('Segoe UI', 20)
-    subtitle_font = pygame.font.SysFont('Segoe UI Light', 12) # Fuente más ligera
+    subtitle_font = pygame.font.SysFont('Segoe UI Light', 12) 
 except pygame.error:
+    # En el caso en el que las fuentes no esten instaladas en el sistema utiliza fuentes por defecto
     title_font = pygame.font.Font(None, 50)
     button_font = pygame.font.Font(None, 30)
     subtitle_font = pygame.font.Font(None, 18)
 
-# --- Función para dibujar el icono ---
+# Función para dibujar el icono del candado que aparece al inicio
 def draw_lock_icon(surface, position):
     """Dibuja un icono simple de candado."""
     x, y = position
@@ -40,7 +41,7 @@ def draw_lock_icon(surface, position):
     # Arco del candado
     pygame.draw.arc(surface, COLOR_BORDER, (x - 15, y - 20, 30, 30), 0, 3.14, 5)
 
-# --- Clase para la creacion de botones ---
+# Clase para la creacion de botones de la interfaz
 class Button:
     def __init__(self, x, y, width, height, text, color, hover_color=None):
         self.rect = pygame.Rect(x, y, width, height)
@@ -72,7 +73,7 @@ class Button:
     def is_clicked(self, event):
         return event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_hovered
 
-# --- Creación de Elementos de la GUI ---
+# Creación de elementos de la GUI con la posicion y tamaño de los botones y del texto
 icon_pos = (WIDTH // 2, 60)
 title_surf = title_font.render("Gestor de Contraseñas", True, COLOR_TEXT)
 title_rect = title_surf.get_rect(center=(WIDTH // 2, 110))
@@ -94,11 +95,11 @@ access_button = Button(
 )
 buttons = [exit_button, access_button]
 
-# --- NUEVO: Variables para la animación de la aparicion ---
+# Variables para la animación de la aparicion de 1 segundo (Para que sea más estético)
 start_time = time.time()
-fade_duration = 1.0 # 1 segundo para completar la aparición
+fade_duration = 1.0 
 
-# --- Bucle Principal ---
+# Bucle principal que genera la ventana
 running = True
 while running:
     for event in pygame.event.get():
@@ -115,16 +116,16 @@ while running:
     for button in buttons:
         button.check_hover(mouse_pos)
 
-    # --- Dibujado en Pantalla ---
+    # Relleno de la pantalla con el color que hemos elegido
     screen.fill(COLOR_BG)
     
-    # --- Lógica de la animación de la aparicion ---
+    # Código que genera la animacion de aparición
     elapsed_time = time.time() - start_time
     alpha = min(255, int(255 * (elapsed_time / fade_duration)))
 
     # Crea una superficie temporal para aplicar la transparencia
     ui_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
-    ui_surface.fill((0, 0, 0, 0)) # Fondo transparente
+    ui_surface.fill((0, 0, 0, 0)) 
 
     # Dibuja todos los elementos en la superficie temporal
     draw_lock_icon(ui_surface, icon_pos)
@@ -142,3 +143,4 @@ while running:
 # Finalizar
 pygame.quit()
 sys.exit()
+
