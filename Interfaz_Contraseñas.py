@@ -6,12 +6,9 @@ import time
 import Nombre_Contraseña
 import generador_contraseñas as gc
 
-# -------------------- Copia temporal --------------------
 def copy_password_temporal(password, duration=30):
-    """
-    Copia la contraseña al portapapeles durante `duration` segundos
-    y luego la limpia automáticamente.
-    """
+    # Copia la contraseña temporalmente en el portapaples durante una duración pequeña(30 segundos)
+    # Eso si, no es del todo eficaz en windows al menos ya que se puede revisar el historial del portapaples
     pyperclip.copy(password)
     def clear_clipboard():
         time.sleep(duration)
@@ -330,3 +327,4 @@ def interfaz_contrasenas(ini):
         pygame.display.flip()
     pygame.quit()
     sys.exit()
+
