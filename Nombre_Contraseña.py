@@ -10,7 +10,7 @@ class InputBox:
         self.text = text
         self.font = font
         self.active = False
-
+    # Manejo de eventos
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.active = self.rect.collidepoint(event.pos)
@@ -20,12 +20,12 @@ class InputBox:
                 self.text = self.text[:-1]
             else:
                 self.text += event.unicode
-
+    #Dibuja la pantalla principal
     def draw(self, screen):
         pygame.draw.rect(screen,self.color,self.rect,2,5)
         text_surface = self.font.render(self.text, True, (239,239,239))
         screen.blit(text_surface,(self.rect.x+10,self.rect.y+10))
-
+# Crea los botones, como en el resto de interfaces
 class Button:
     def __init__(self, rect, text, color, hover_color=None, font=None):
         self.rect = pygame.Rect(rect)
@@ -49,7 +49,7 @@ class Button:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button==1:
             return self.rect.collidepoint(event.pos)
         return False
-
+# Mensajes
 def draw_message_box(screen, text):
     box = pygame.Rect(0,0,400,150)
     box.center = screen.get_rect().center
@@ -60,9 +60,9 @@ def draw_message_box(screen, text):
     rect = surf.get_rect(center=(box.centerx, box.centery-20))
     screen.blit(surf, rect)
     return Button((box.centerx-50, box.bottom-45, 100, 35),"Aceptar",(0,123,255))
-
+# Pantalla de generación de nueva contraseña
 def Nombre_Contraseña(ini, screen):
-    """Pantalla de nueva contraseña. Reutiliza `screen` existente."""
+   
     WIDTH, HEIGHT = screen.get_size()
     COLOR_BG = (34,38,41)
     COLOR_TEXT = (239,239,239)
@@ -81,6 +81,7 @@ def Nombre_Contraseña(ini, screen):
     close_on_success = False
 
     running = True
+    # Maneja los diferentes eventos mientras está activo
     while running:
         mouse_pos = pygame.mouse.get_pos()
         events = pygame.event.get()
