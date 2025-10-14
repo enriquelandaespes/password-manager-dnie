@@ -3,10 +3,8 @@ import json
 from hashlib import sha256
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography import x509
-
-# pkcs11
 from pkcs11 import lib as pkcs11_lib, ObjectClass, Attribute
-from pkcs11 import Mechanism  # mecanismo de firma
+from pkcs11 import Mechanism  # Mecanismo de Firma
 
 class manejo_datos:
     PKCS11_LIB = r"C:\Program Files\OpenSC Project\OpenSC\pkcs11\opensc-pkcs11.dll"
@@ -23,7 +21,7 @@ class manejo_datos:
         self.token = self._obtener_token()
         self.cert = self._obtener_certificado_autenticacion()
         self.nif = self._obtener_nif()
-        self.nombre = self._obtener_nombre()  # CN del certificado
+        self.nombre = self._obtener_nombre()  # Obtenemos el nombre del certificado
         self.serial_hash = self._obtener_hash_serial()  # hash del número de serie
         # archivos:
         self.archivo_kdb = os.path.join(os.path.dirname(__file__), f"kdb_enc_{self.serial_hash}.bin")
@@ -34,7 +32,7 @@ class manejo_datos:
         self._inicializar_C()
         self._inicializar_kdb()
 
-    # ---------- DNIe, token y certificados ----------
+    # Funcion de verificacion del pin del DNIe
     def verificar_dnie(self, pin):
         try:
             pkcs11 = pkcs11_lib(self.PKCS11_LIB)
@@ -46,14 +44,16 @@ class manejo_datos:
                 return True
         except Exception:
             return False
-
+            
+    # Funcion para obtener el token del DNIe
     def _obtener_token(self):
         pkcs11 = pkcs11_lib(self.PKCS11_LIB)
         slots = pkcs11.get_slots(token_present=True)
         if not slots:
             raise RuntimeError("No se encontró token DNIe.")
         return slots[self.SLOT_INDEX].get_token()
-
+        
+    # Funcion para obtener el certificado de autenticacion del DNIe
     def _obtener_certificado_autenticacion(self):
         with self.token.open(rw=True) as session:
             certificados = list(session.get_objects({Attribute.CLASS: ObjectClass.CERTIFICATE}))
@@ -62,13 +62,15 @@ class manejo_datos:
             der = certificados[0][Attribute.VALUE]
             return x509.load_der_x509_certificate(der)
 
+    # Funcion para obtener el NIF
     def _obtener_nif(self):
         subject = self.cert.subject
         for attr in subject:
             if attr.oid.dotted_string == "2.5.4.5":
                 return attr.value
         raise RuntimeError("No se encontró NIF en certificado.")
-
+        
+    # Funcion para obtener el nombre del DNIe
     def _obtener_nombre(self):
         subject = self.cert.subject
         for attr in subject:
@@ -76,12 +78,14 @@ class manejo_datos:
                 return attr.value
         return f"usuario_{self.nif}"
 
+    # Funcion para calcular el hash del numero de serie del DNIe
     def _obtener_hash_serial(self) -> str:
         serial = str(self.cert.serial_number).encode('utf-8')
         h = sha256(serial).hexdigest()[:16]
         return h
 
-    # ---------- Gestión de C (64-bit común) ----------
+    # Gestión de C (64 bits): Es un numero aleatorio usado para ser firmado y con ello cifrar la K_db (Clave de cifrado de la base de datos. Cada "cliente" tiene una K_db distinta)
+    # Funcion para inicializar C si no existe.
     def _inicializar_C(self):
         if os.path.exists(self.archivo_C):
             return
@@ -89,6 +93,7 @@ class manejo_datos:
         with open(self.archivo_C, "wb") as f:
             f.write(C)
 
+    # Funcion para leer C si ya existe
     def _leer_C(self) -> bytes:
         with open(self.archivo_C, "rb") as f:
             data = f.read()
@@ -96,7 +101,7 @@ class manejo_datos:
             raise RuntimeError("Valor C inválido (longitud incorrecta).")
         return data
 
-    # ---------- Firma con el DNI (S = firma_de(C)) ----------
+    # Firma con el DNI (S = firma_de(C))
     def _firmar_con_dni(self, data: bytes) -> bytes:
         with self.token.open(user_pin=self.pin) as session:
             keys = list(session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY}))
@@ -112,7 +117,7 @@ class manejo_datos:
                     raise RuntimeError(f"Error al firmar con DNIe: {e2}") from e
             return signature
 
-    # ---------- k_db (clave de la BD) por DNI ----------
+    # k_db (clave de la Base de Datos). Cada DNI tiene su propia Clave
     def _inicializar_kdb(self):
         if os.path.exists(self.archivo_kdb):
             return
@@ -127,6 +132,7 @@ class manejo_datos:
             f.write(nonce + ct)
         self._k_db_cache = k_db
 
+    # Funcion para descifrar la Clave K_db
     def _descifrar_kdb(self) -> bytes:
         if self._k_db_cache is not None:
             return self._k_db_cache
@@ -144,7 +150,8 @@ class manejo_datos:
         self._k_db_cache = k_db
         return k_db
 
-    # ---------- Base de datos ----------
+    # Funciones de manejo de la Base de datos
+    # Funcion para cargar la base de datos
     def cargar_bd(self):
         k_db = self._descifrar_kdb()
         if not os.path.exists(self.archivo_bd):
@@ -157,6 +164,7 @@ class manejo_datos:
         datos_bytes = aesgcm.decrypt(nonce, ct, associated_data=None)
         return json.loads(datos_bytes.decode("utf-8"))
 
+    # Funcion para guardar la Base de Datos
     def guardar_bd(self, db):
         k_db = self._descifrar_kdb()
         aesgcm = AESGCM(k_db)
@@ -165,7 +173,7 @@ class manejo_datos:
         with open(self.archivo_bd, "wb") as f:
             f.write(nonce + ct)
 
-    # ---------- CRUD ----------
+    # Funcion para agregar nuevas contraseñas
     def agregar_contraseña(self, nombre, contraseña):
         db = self.cargar_bd()
         if any(u["nombre"] == nombre for u in db["Contrasenas"]):
@@ -174,6 +182,7 @@ class manejo_datos:
         self.guardar_bd(db)
         return True
 
+    # Funcion para editar contraseñas ya existentes
     def editar_contraseña(self, nombre_actual, nueva_contraseña):
         if not nueva_contraseña or len(nueva_contraseña) < 15:
             return False
@@ -185,6 +194,7 @@ class manejo_datos:
                 return True
         return False
 
+    # Funcion para eliminar contraseñas
     def eliminar_contraseña(self, nombre):
         db = self.cargar_bd()
         original_len = len(db["Contrasenas"])
@@ -195,6 +205,7 @@ class manejo_datos:
         else:
             return False
 
+    # Funcion para editar el nombre
     def editar_nombre(self, nombre_actual, nuevo_nombre):
         if not nuevo_nombre or not nuevo_nombre.strip():
             return False
@@ -207,3 +218,4 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
