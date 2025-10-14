@@ -5,16 +5,10 @@ def crear_contraseña(longitud):
     """
     Esta función genera una contraseña aleatoria con la longitud especificada.
     """
-    # 1. Definimos los caracteres que usaremos
-    #    - string.ascii_letters (letras mayúsculas y minúsculas)
-    #    - string.digits (números del 0 al 9)
-    #    - string.punctuation (símbolos como !, @, #, $, etc.)
+    # Definimos los carácteres que usaremos
     caracteres = string.ascii_letters + string.digits + string.punctuation
 
-    # 2. Generamos la contraseña
-    #    - random.choice() selecciona un carácter al azar del grupo anterior.
-    #    - Hacemos esto 'longitud' veces.
-    #    - ''.join() une todos los caracteres seleccionados en un solo texto.
+    # Generamos la contraseña con los carácteres que hemos seleccionado anteriormente
     contraseña_generada = ''.join(random.choice(caracteres) for i in range(longitud))
     
     return contraseña_generada
@@ -28,3 +22,4 @@ def generar_contraseña():
         contraseña_final = crear_contraseña(longitud_deseada)
 
         return contraseña_final
+
