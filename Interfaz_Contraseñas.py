@@ -16,7 +16,7 @@ def copy_password_temporal(password, duration=30):
             pyperclip.copy("")
     threading.Thread(target=clear_clipboard, daemon=True).start()
 
-# -------------------- Botón --------------------
+# Botones
 class Button:
     def __init__(self, rect, text, color, hover_color=None, text_color=(255,255,255), font=None):
         self.rect = pygame.Rect(rect)
@@ -44,7 +44,7 @@ class Button:
             return self.rect.collidepoint(mouse_pos_relative)
         return False
 
-# -------------------- Diálogo no bloqueante --------------------
+# Ventana que no bloquea la anterior
 class ConfirmDialog:
     def __init__(self, text, font, screen):
         self.text = text
@@ -78,7 +78,7 @@ class ConfirmDialog:
                 btn.check_hover(mouse_pos)
                 btn.draw(self.screen)
 
-# -------------------- Ventana de edición --------------------
+# Ventana de edición (Aqui aparece la interfaz para editar la contraseña)
 def edit_entry_screen(screen, ini, entry, notify_callback):
     from Nombre_Contraseña import InputBox
     edit_running = True
@@ -114,7 +114,7 @@ def edit_entry_screen(screen, ini, entry, notify_callback):
                 new_name = input_nombre.text.strip()
                 new_pass = input_pass.text.strip()
                 
-                # --- Validaciones ---
+                # Notificaciones de error (Además en manejo de datos no admite las modificaciones)
                 if new_name == "":
                     show_local_notification("El nombre no puede estar vacío", error=True)
                     continue
@@ -122,7 +122,7 @@ def edit_entry_screen(screen, ini, entry, notify_callback):
                     show_local_notification("La contraseña debe tener al menos 15 caracteres", error=True)
                     continue
 
-                # --- Lógica de Actualización Corregida ---
+                # Variables que determinan si el nuevo nombre es diferente al que ya existía
                 nombre_ha_cambiado = (new_name != entry['nombre'])
                 actualizacion_exitosa = True # Suponemos que todo irá bien
 
@@ -145,7 +145,7 @@ def edit_entry_screen(screen, ini, entry, notify_callback):
                     notify_callback("Entrada actualizada correctamente")
                     edit_running = False
 
-        # Fondo de edición semitransparente
+        # Fondo de la ventana de editar
         screen.fill((34,38,41))
         font = pygame.font.Font(None,28)
         screen.blit(font.render("Nombre:",True,(255,255,255)),(gui_rect.x+20,gui_rect.y+30))
@@ -167,7 +167,7 @@ def edit_entry_screen(screen, ini, entry, notify_callback):
 
         pygame.display.flip()
 
-# -------------------- Interfaz principal --------------------
+# Interfaz principal
 def interfaz_contrasenas(ini):
     pygame.init()
     WIDTH, HEIGHT = 1400,750
@@ -189,13 +189,13 @@ def interfaz_contrasenas(ini):
     notification_end_time = 0
     notification_color = (25,135,84)
     dialogs = []
-
+    # Ventana de notificaciones (Popups). Si hay error esta en rojo y sino en verde
     def notify(text,duration=2000,error=False):
         nonlocal notification_text, notification_end_time, notification_color
         notification_text = text
         notification_end_time = pygame.time.get_ticks()+duration
         notification_color = (220,53,69) if error else (25,135,84)
-
+    # Recarga la lista de entrada de las contraseñas (Para cuando hay modificaciones en otra ventana)
     def reload_data():
         nonlocal lista_entries
         lista_entries = []
@@ -211,6 +211,7 @@ def interfaz_contrasenas(ini):
     reload_data()
 
     running = True
+    # Junta todas las funciones anteriores y el resto de parámetros en función del evento que ocurra
     while running:
         mouse_pos = pygame.mouse.get_pos()
         events = pygame.event.get()
@@ -222,7 +223,7 @@ def interfaz_contrasenas(ini):
 
         screen.fill(COLOR_BG)
 
-        # Header
+     
         header_surf = pygame.Surface((WIDTH,40))
         header_surf.fill(COLOR_BG)
         header_surf.blit(header_font.render("Nombre", True,COLOR_HEADER),(20,10))
@@ -246,6 +247,7 @@ def interfaz_contrasenas(ini):
             list_surf.blit(row_font.render(pass_text, True, COLOR_TEXT),(200,y_pos+10))
 
             btn_x = 650
+            # Genera los botones para cada contraseña
             if not entry["buttons"]:
                 entry["buttons"]["show"] = Button((btn_x,y_pos+5,70,30),"Ocultar" if entry["is_shown"] else "Mostrar",(0,123,255),font=button_font)
                 entry["buttons"]["copy"] = Button((btn_x+90,y_pos+5,70,30),"Copiar",(108,117,125),font=button_font)
@@ -254,6 +256,7 @@ def interfaz_contrasenas(ini):
                 entry["buttons"]["del"] = Button((btn_x+360,y_pos+5,70,30),"Borrar",(220,53,69),font=button_font)
 
             list_scroll_offset = (list_offset[0], list_offset[1]-scroll_y)
+            # Eventos que pueden ocurrie en las ventanas
             for event in events:
                 if entry["buttons"]["show"].is_clicked(event,list_scroll_offset):
                     entry["is_shown"] = not entry["is_shown"]
@@ -277,7 +280,7 @@ def interfaz_contrasenas(ini):
         scroll_y = max(0,min(scroll_y,max(list_total_height-list_area_height,0)))
         screen.blit(list_surf,list_offset,(0,scroll_y,WIDTH,list_area_height))
 
-        # Footer
+        # Resto de botones al pie de página
         footer_offset = (0,HEIGHT-50)
         footer_surf = pygame.Surface((WIDTH,50))
         footer_surf.fill(COLOR_BG)
@@ -327,4 +330,5 @@ def interfaz_contrasenas(ini):
         pygame.display.flip()
     pygame.quit()
     sys.exit()
+
 
