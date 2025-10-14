@@ -6,12 +6,12 @@ import Interfaz_Contraseñas as ic
 import manejo_datos as md
 import threading
 
-# Global para almacenar el resultado de la verificación
+# Variable global para almacenar el resultado de la verificación
 verification_result = {}
 
 def verify_dnie_thread_func(pin):
     
-    #Esta función se ejecuta en un hilo separado para no bloquear la GUI.
+    # Esta función se ejecuta en un hilo separado para no bloquear la GUI.
     global verification_result
     try:
         ini = md.manejo_datos(pin)
@@ -25,15 +25,15 @@ def verify_dnie_thread_func(pin):
 
 
 def iniciar_verificacion():
-    # --- Inicialización de Pygame ---
+    # Iniciamos Pygame
     pygame.init()
 
-    # --- Configuración de la Ventana ---
+    # Configuración de la Ventana 
     WIDTH, HEIGHT = 600, 300
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Verificación del DNIe")
 
-    # --- Colores ---
+    # Configuracion de los Colores
     COLOR_BG = (34, 38, 41)
     COLOR_TEXT = (239, 239, 239)
     COLOR_SUCCESS = (25, 135, 84)
@@ -42,13 +42,13 @@ def iniciar_verificacion():
     COLOR_INACTIVE = (108, 117, 125)
     COLOR_ACTIVE = (0, 123, 255)
 
-    # --- Fuentes ---
+    # Configuracion de las Fuentes 
     title_font = pygame.font.Font(None, 50)
     subtitle_font = pygame.font.Font(None, 24)
     input_font = pygame.font.Font(None, 32)
     status_font = pygame.font.Font(None, 22)
 
-    # --- Función para dibujar el spinner de carga ---
+    # Función para dibujar la ruleta de carga
     def draw_loading_spinner(surface, center_pos, num_dots=8, radius=25, dot_radius=5, angle_offset=0):
         for i in range(num_dots):
             angle = 2 * math.pi * i / num_dots + math.radians(angle_offset)
@@ -61,7 +61,7 @@ def iniciar_verificacion():
             
             pygame.draw.circle(surface, color, (x, y), dot_radius)
 
-    # --- Clase para la creacion de botones ---
+    # Clase para la creacion de botones 
     class Button:
         def __init__(self, x, y, width, height, text, color, hover_color=None):
             self.rect = pygame.Rect(x, y, width, height)
@@ -80,7 +80,7 @@ def iniciar_verificacion():
         def is_clicked(self, event):
             return event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_hovered
 
-    # --- Creación de Elementos de la GUI ---
+    # Creación de Elementos de la GUI
     title_surf = title_font.render("Verificación del DNIe", True, COLOR_TEXT)
     title_rect = title_surf.get_rect(center=(WIDTH // 2, 50))
     subtitle_surf = subtitle_font.render("Por favor, introduce el PIN de tu DNIe:", True, COLOR_TEXT)
@@ -98,7 +98,7 @@ def iniciar_verificacion():
     spinner_angle = 0
     verification_thread = None
 
-    # --- Bucle Principal ---
+    # Bucle Principal 
     running = True
     while running:
         for event in pygame.event.get():
@@ -139,7 +139,7 @@ def iniciar_verificacion():
         screen.fill(COLOR_BG)
         screen.blit(title_surf, title_rect)
 
-        # --- Lógica de dibujado y estado ---
+        # Lógica de dibujado y estado
         if is_verifying:
             draw_loading_spinner(screen, (WIDTH // 2, 165), angle_offset=spinner_angle)
             status_surf = status_font.render("Verificando...", True, COLOR_TEXT)
@@ -159,7 +159,7 @@ def iniciar_verificacion():
                 else: # Si falla
                     status_message = "PIN incorrecto o DNIe no válido."
                     status_color = COLOR_DANGER
-                    pin_text = "" # Borrar el PIN para el siguiente intento
+                    pin_text = "" # Borrar el PIN
         
         elif transition_time: # Si la verificación fue exitosa, mostrar solo el mensaje
             status_surf = status_font.render(status_message, True, status_color)
@@ -187,4 +187,5 @@ def iniciar_verificacion():
 
 if __name__ == "__main__":
     iniciar_verificacion()
+
 
