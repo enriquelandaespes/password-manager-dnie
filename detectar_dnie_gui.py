@@ -5,42 +5,42 @@ import detectar_dnie as det
 import verificar_dnie_gui as vdnie
 
 def detectar_dnie():
-    # --- Inicialización de Pygame ---
+    # Inicialización de Pygame
     pygame.init()
 
-    # --- Configuración de la Ventana ---
+    # Configuración de la Ventana 
     WIDTH, HEIGHT = 600, 250
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Detectando DNIe")
 
-    # --- Colores ---
+    # Configuración de los Colores
     COLOR_BG = (34, 38, 41)
     COLOR_TEXT = (239, 239, 239)
     COLOR_SUCCESS = (25, 135, 84)
     COLOR_DANGER = (220, 53, 69)
     COLOR_INACTIVE = (108, 117, 125) 
 
-    # --- Fuentes ---
+    # Configuración de las Fuentes
     title_font = pygame.font.Font(None, 50)
     subtitle_font = pygame.font.Font(None, 24)
 
-    # --- Configuración de la Barra de Carga ---
+    # Configuración de la Barra de Carga
     BAR_WIDTH, BAR_HEIGHT = 300, 15
     bar_x = (WIDTH - BAR_WIDTH) // 2
     bar_y = HEIGHT // 2 + 40
     bar_bg_rect = pygame.Rect(bar_x, bar_y, BAR_WIDTH, BAR_HEIGHT)
 
-    # --- Constante para el tiempo de espera ---
+    # Constante para el tiempo de espera
     WAIT_SECONDS = 1.0 
 
-    # --- Variables de estado ---
+    # Variables de estado
     start_time = time.time()
     detection_result = None
     status_message = "Detectando DNIe..."
     status_color = COLOR_TEXT
     transition_time = None
 
-    # --- Bucle Principal ---
+    # Bucle Principal
     running = True
     while running:
         for event in pygame.event.get():
@@ -93,3 +93,4 @@ def detectar_dnie():
 
 if __name__ == "__main__":
     detectar_dnie()
+
