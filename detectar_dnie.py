@@ -1,7 +1,7 @@
 import sys
-from smartcard.System import readers
 
 # Verifica si la librería pyscard está instalada
+
 try:
     from smartcard.System import readers
 except ImportError:
@@ -45,5 +45,6 @@ def detectar_dnie():
             return False
             
     except Exception as e:
-        #print(f"Se ha producido un error: {e}")
+        #print(f"Se ha producido un error")
         return False
+
