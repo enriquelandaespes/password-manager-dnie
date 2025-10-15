@@ -8,8 +8,6 @@ Un gestor de contraseñas de escritorio seguro que utiliza las capacidades cript
 
 Características Principales
 
-—----------------------------------------------------------------------------------------------------------------------
-
 Máxima Seguridad con DNIe: La clave que se utiliza para cifrar la clave de la base de datos se basa en la firma de DNI electrónico por lo que es necesario para poder acceder a la base de datos
 
 Cifrado Fuerte: La base de datos está completamente cifrada utilizando el algoritmo AES-256 GCM.
@@ -21,9 +19,11 @@ Interfaz Gráfica Intuitiva: Una GUI sencilla y funcional creada con Pygame que 
 Generador de Contraseñas Seguras: Incluye una herramienta para generar contraseñas aleatorias y robustas de longitud variable (15-25 caracteres).
 
 Portapapeles Seguro: Al copiar una contraseña, esta se elimina automáticamente del portapapeles después de 30 segundos para mayor seguridad. Depende del sistema operativo se puede ver con el historial del portapapeles si está activo, es algo que no se puede cambiar a no ser que se cambie la configuración del propio sistema operativo.
+
 —------------------------------------------------------------------------------------------------------------------
+
 Funcionamiento de la Seguridad 
-—------------------------------------------------------------------------------------------------------------------
+
 Este gestor basa su seguridad en el dni por lo que se utilizará su firma, que es accesible únicamente si se posee del dni físico y se conoce su número pin. Para ello se utiliza una clave simétrica y un desafío que deberá ser firmado por el dni para obtener esta clave simétrica.
 
 Número Desafío (C): La primera vez que se ejecuta, la aplicación crea un número aleatorio único de 64 bits, llamado C, que es común para la aplicación y cualquier usuario.
@@ -37,9 +37,11 @@ Descifrado de la Clave Maestra (K_db): La clave K se utiliza para descifrar la c
 Acceso a la Base de Datos: Finalmente, K_db se utiliza para descifrar la base de datos JSON principal que contiene todas las contraseñas del usuario.
 
 Este conjunto de claves que se pueden obtener únicamente con el DNIe proporcionan seguridad, integridad y confidencialidad a la hora de gestionar las contraseñas.
+
 —------------------------------------------------------------------------------------------------------------------------
+
 Requisitos Previos 
-—------------------------------------------------------------------------------------------------------------------------
+
 Antes de ejecutar el programa, asegúrate de tener lo siguiente:
 
 Python 3.9 o superior.
@@ -61,8 +63,9 @@ https://www.dnielectronico.es/portaldnie/prf1_cons02.action?pag=ref_1101
 El programa está configurado para usar la librería opensc-pkcs11.dll. Asegúrate de que la ruta en manejo_datos.py coincida con tu instalación.
 
 —------------------------------------------------------------------------------------------------------------------
+
 Instalación y Ejecución 
-—------------------------------------------------------------------------------------------------------------------
+
 Clona o descarga este repositorio en tu máquina.
 
 Abre una terminal en la carpeta del proyecto (o adjunta la ruta correspondiente).
@@ -76,8 +79,9 @@ Ejecuta el script principal:
 python Inicio_Gestor.py
 
 —------------------------------------------------------------------------------------------------------------------
+
 Estructura del Proyecto 
-—------------------------------------------------------------------------------------------------------------------
+
 Inicio_Gestor.py: Punto de entrada de la aplicación. Muestra la pantalla de bienvenida y da paso al resto del programa.
 
 detectar_dnie.py: Lógica de bajo nivel para detectar la presencia del lector y del DNIe verificando si hay un lector conectado y en este hay conectado un DNIe.
@@ -95,8 +99,9 @@ Nombre_Contraseña.py: La ventana emergente para añadir o editar entradas.
 generador_contraseñas.py: Utilidad para la generación de contraseñas seguras.
 
 —------------------------------------------------------------------------------------------------------------------
+
 Autores
-—------------------------------------------------------------------------------------------------------------------
+
 Enrique Landa
 
 Ruben Sanz
