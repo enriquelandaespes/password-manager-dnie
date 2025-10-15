@@ -6,7 +6,7 @@ Un gestor de contraseñas de escritorio seguro que utiliza las capacidades cript
 
 —----------------------------------------------------------------------------------------------------------------------
 
-##Características Principales
+#Características Principales
 
 Máxima Seguridad con DNIe: La clave que se utiliza para cifrar la clave de la base de datos se basa en la firma de DNI electrónico por lo que es necesario para poder acceder a la base de datos
 
