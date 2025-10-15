@@ -98,8 +98,7 @@ Nombre_Contraseña.py: La ventana emergente para añadir o editar entradas.
 
 generador_contraseñas.py: Utilidad para la generación de contraseñas seguras.
 
-Comprobacion_paquetes.py: Utilidad para la verificacion e instalacion de las librerias mencionadas anteriormente.
-
+Comprobacion_paquetes.py: Utilidad para la verificacion e instalacion de las librerias mencionadas anteriormente. Se ejecuta aparte del programa principal para poder instalar las librerias correctamente.
 —------------------------------------------------------------------------------------------------------------------
 
 ### Autores
