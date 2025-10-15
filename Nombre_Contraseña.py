@@ -67,8 +67,7 @@ def Nombre_Contraseña(ini, screen):
     COLOR_TEXT = (239,239,239)
     main_font = pygame.font.Font(None,28)
 
-    # Nuevo ancho para los InputBox
-    input_width = 310  # antes era 250
+    input_width = 310
     input_height = 40
 
     # Inputs centrados
