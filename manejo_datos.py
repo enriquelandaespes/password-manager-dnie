@@ -160,7 +160,7 @@ class manejo_datos:
 
     # Funcion para guardar la Base de Datos
     def guardar_bd(self, db):
-        k_db = self._descifrar_kdb()
+        k_db = self.descifrar_kdb()
         aesgcm = AESGCM(k_db)
         nonce = os.urandom(12)
         ct = aesgcm.encrypt(nonce, json.dumps(db, indent=4).encode("utf-8"), associated_data=None)
@@ -212,6 +212,7 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
 
 
 
