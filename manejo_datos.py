@@ -81,18 +81,24 @@ class manejo_datos:
     # Firma con el DNI (S = firma_de(C))
     def firmar_con_dni(self, data: bytes) -> bytes:
         with self.token.open(user_pin=self.pin) as session:
-            keys = list(session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY})) # Encontramos donde esta la clave privada(No se puede extraer)
+            # Busca la clave privada en el DNIe
+            keys = list(session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY}))
             if not keys:
                 raise RuntimeError("No se encontró clave privada para firmar en el token.")
-            priv = keys[0] # Obtenemos la clave privada(NO EL VALOR)
+            
+            priv = keys[0]
+            
             try:
-                signature = priv.sign(data, mechanism=Mechanism.SHA256_RSA_PKCS) # Firmamos con la clave privada los datos
+                # Se intenta firmar ÚNICAMENTE con el mecanismo seguro especificado.
+                signature = priv.sign(data, mechanism=Mechanism.SHA256_RSA_PKCS)
+                return signature
             except Exception as e:
-                try:
-                    signature = priv.sign(data) # Si no puede firmar con Mechanism firma con otro método
-                except Exception as e2:
-                    raise RuntimeError(f"Error al firmar con DNIe: {e2}") from e
-            return signature
+                # Si la firma con SHA256 falla por cualquier motivo, lanzamos un error claro.
+                # Ya no se intenta un segundo método inseguro.
+                raise RuntimeError(
+                    "El DNIe no pudo firmar con el mecanismo de seguridad requerido (SHA256_RSA_PKCS). "
+                    f"Asegúrate de que los drivers son correctos y el DNIe es compatible. Error original: {e}"
+                ) from e
 
     # Cada DNI tiene su propia Clave. Esta función la inicializa si no existía anteriormente
     def inicializar_kdb(self):
@@ -194,6 +200,7 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
 
 
 
