@@ -14,7 +14,7 @@ def verify_dnie_thread_func(pin):
     # Esta función se ejecuta en un hilo separado para no bloquear la GUI.
     global verification_result
     try:
-        ini = md.manejo_datos(pin)
+        ini = md.manejo_datos(pin) # Aqui se inicializa la instancia de manejo de datos y el resto de programas trabajaran sobre esa instancia. 
         if ini.verificar_dnie(pin):
             verification_result = {'status': 'success', 'instance': ini}
         else:
@@ -187,5 +187,6 @@ def iniciar_verificacion():
 
 if __name__ == "__main__":
     iniciar_verificacion()
+
 
 
