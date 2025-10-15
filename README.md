@@ -38,7 +38,7 @@ Acceso a la Base de Datos: Finalmente, K_db se utiliza para descifrar la base de
 
 Este conjunto de claves que se pueden obtener únicamente con el DNIe proporcionan seguridad, integridad y confidencialidad a la hora de gestionar las contraseñas.
 
-—------------------------------------------------------------------------------------------------------------------------
+—----------------------------------------------------------------------------------------------------------------------
 
 ### Requisitos Previos 
 
