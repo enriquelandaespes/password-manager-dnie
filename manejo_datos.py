@@ -1,10 +1,10 @@
-import os
-import json
-from hashlib import sha256
+import os # Sirve para poder obtener la ruta a la biblioteca pkcs11 en el sistema operativo
+import json # Sirve para entender la base de datos con el lenguaje JSON
+from hashlib import sha256 # Sirve para obetener el hash de algunas claves con el algoritmo sha256
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography import x509
-from pkcs11 import lib as pkcs11_lib, ObjectClass, Attribute
-from pkcs11 import Mechanism  # Mecanismo de Firma
+from cryptography import x509 # Sirve para leer y entender los certificados digitales del dni
+from pkcs11 import lib as pkcs11_lib, ObjectClass, Attribute # Sirve para poder interactuar con el dni
+from pkcs11 import Mechanism # Sirve para implementar el mecanismo de firma del dni (Sirve para más cosas pero en este caso lo utilizamos para firmar)
 
 class manejo_datos:
     PKCS11_LIB = r"C:\Program Files\OpenSC Project\OpenSC\pkcs11\opensc-pkcs11.dll"
@@ -218,4 +218,5 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
 
