@@ -22,7 +22,7 @@ Portapapeles Seguro: Al copiar una contraseña, esta se elimina automáticamente
 
 —------------------------------------------------------------------------------------------------------------------
 
-Funcionamiento de la Seguridad 
+### Funcionamiento de la Seguridad 
 
 Este gestor basa su seguridad en el dni por lo que se utilizará su firma, que es accesible únicamente si se posee del dni físico y se conoce su número pin. Para ello se utiliza una clave simétrica y un desafío que deberá ser firmado por el dni para obtener esta clave simétrica.
 
@@ -40,7 +40,7 @@ Este conjunto de claves que se pueden obtener únicamente con el DNIe proporcion
 
 —------------------------------------------------------------------------------------------------------------------------
 
-Requisitos Previos 
+### Requisitos Previos 
 
 Antes de ejecutar el programa, asegúrate de tener lo siguiente:
 
@@ -64,7 +64,7 @@ El programa está configurado para usar la librería opensc-pkcs11.dll. Asegúra
 
 —------------------------------------------------------------------------------------------------------------------
 
-Instalación y Ejecución 
+### Instalación y Ejecución 
 
 Clona o descarga este repositorio en tu máquina.
 
@@ -80,7 +80,7 @@ python Inicio_Gestor.py
 
 —------------------------------------------------------------------------------------------------------------------
 
-Estructura del Proyecto 
+### Estructura del Proyecto 
 
 Inicio_Gestor.py: Punto de entrada de la aplicación. Muestra la pantalla de bienvenida y da paso al resto del programa.
 
@@ -100,7 +100,7 @@ generador_contraseñas.py: Utilidad para la generación de contraseñas seguras.
 
 —------------------------------------------------------------------------------------------------------------------
 
-Autores
+### Autores
 
 Enrique Landa
 
