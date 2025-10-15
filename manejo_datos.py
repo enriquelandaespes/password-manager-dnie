@@ -17,35 +17,30 @@ class manejo_datos:
     # Constructor de manejo de datos, solo necesita el pin, self representa al propio objeto que crea el constructor
     def __init__(self, pin: str):
         self.pin = pin # Obtiene el valor del pin(En verificar dnie)
-        self.token = self.obtener_token() # Obtiene el token del
-        self.cert = self.obtener_certificado_autenticacion()
-        self.nif = self.obtener_nif()
+        self.token = self.obtener_token() # Obtiene el token del dni, el token es el "Pase de acceso" del dni, verifica la identidad y permite acceder sin mostrar la clave privada
+        self.cert = self.obtener_certificado_autenticacion() # Obtiene el certificado de autenticacion del dni
         self.nombre = self.obtener_nombre()  # Obtenemos el nombre del certificado
-        self.serial_hash = self.obtener_hash_serial()  # hash del número de serie
+        self.serial_hash = self.obtener_hash_serial()  # hash del número de serie del dni
         # archivos:
-        self.archivo_kdb = os.path.join(os.path.dirname(__file__), f"kdb_enc_{self.serial_hash}.bin")
-        self.archivo_bd = os.path.join(os.path.dirname(__file__), f"Database_{self.serial_hash}.json.enc")
-        self.archivo_C = os.path.join(os.path.dirname(__file__), self.C_FILENAME)
-        self.k_db_cache = None
+        self.archivo_kdb = os.path.join(os.path.dirname(__file__), f"kdb_enc_{self.serial_hash}.bin") # Archivo que guarda la clave de acceso a la base de datos
+        self.archivo_bd = os.path.join(os.path.dirname(__file__), f"Database_{self.serial_hash}.json.enc") # Archivo(json) que guarda la base de datos del dni. Se identifica por el hash del numero de serie del dni
+        self.archivo_C = os.path.join(os.path.dirname(__file__), self.C_FILENAME) # Archivo que guarda el número C, es el único que no va cifrado.
+        self.k_db_cache = None # Guarda la k_db cuando es necesario para no tener que firmar constantemente con el dni, acelera los procesos, de primeras no se inicializa.
 
-        self.inicializar_C()
-        self.inicializar_kdb()
+        self.inicializar_C() # Crea C si no existía anteriormente
+        self.inicializar_kdb() # Crea kdb si no existia anteriormente para ese usuario.
 
     # Funcion de verificacion del pin del DNIe
     def verificar_dnie(self, pin):
         try:
-            pkcs11 = pkcs11_lib(self.PKCS11_LIB)
-            slots = pkcs11.get_slots(token_present=True)
-            if not slots:
-                return False
-            token = slots[self.SLOT_INDEX].get_token()
-            with token.open(user_pin=pin):
+            token = obtener_token()
+            with token.open(user_pin=pin): # Verifica que el pin es el correcto pasandole al token el pin que introduce el usuario.
                 return True
         except Exception:
             return False
             
     # Funcion para obtener el token del DNIe
-    def _obtener_token(self):
+    def obtener_token(self):
         pkcs11 = pkcs11_lib(self.PKCS11_LIB)
         slots = pkcs11.get_slots(token_present=True)
         if not slots:
@@ -217,6 +212,7 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
 
 
 
