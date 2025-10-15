@@ -19,7 +19,6 @@ class manejo_datos:
         self.pin = pin # Obtiene el valor del pin(En verificar dnie)
         self.token = self.obtener_token() # Obtiene el token del dni, el token es el "Pase de acceso" del dni, verifica la identidad y permite acceder sin mostrar la clave privada
         self.cert = self.obtener_certificado_autenticacion() # Obtiene el certificado de autenticacion del dni
-        self.nombre = self.obtener_nombre()  # Obtenemos el nombre del certificado
         self.serial_hash = self.obtener_hash_serial()  # hash del número de serie del dni
         # archivos:
         self.archivo_kdb = os.path.join(os.path.dirname(__file__), f"kdb_enc_{self.serial_hash}.bin") # Archivo que guarda la clave de acceso a la base de datos
@@ -29,16 +28,7 @@ class manejo_datos:
 
         self.inicializar_C() # Crea C si no existía anteriormente
         self.inicializar_kdb() # Crea kdb si no existia anteriormente para ese usuario.
-
-    # Funcion de verificacion del pin del DNIe
-    def verificar_dnie(self, pin):
-        try:
-            token = self.obtener_token()
-            with token.open(user_pin=pin): # Verifica que el pin es el correcto pasandole al token el pin que introduce el usuario.
-                return True
-        except Exception:
-            return False
-            
+        
     # Funcion para obtener el token del DNIe
     def obtener_token(self):
         pkcs11 = pkcs11_lib(self.PKCS11_LIB)
@@ -47,35 +37,28 @@ class manejo_datos:
             raise RuntimeError("No se encontró token DNIe.")
         return slots[self.SLOT_INDEX].get_token()
         
+    # Funcion de verificacion del pin del DNIe
+    def verificar_dnie(self, pin):
+        try:
+            token = self.obtener_token()
+            with token.open(user_pin=pin): # Verifica que el pin es el correcto pasandole al token el pin que introduce el usuario.
+                return True
+        except Exception: # Excepcion si no encuentra el token o el pin es incorrecto
+            return False 
+            
     # Funcion para obtener el certificado de autenticacion del DNIe
     def obtener_certificado_autenticacion(self):
-        with self.token.open(rw=True) as session:
-            certificados = list(session.get_objects({Attribute.CLASS: ObjectClass.CERTIFICATE}))
-            if not certificados:
+        with self.token.open(rw=True) as session: # Con el token abierto con permisos de lectura (No hace falta el pin para acceder a certificados)
+            certificados = list(session.get_objects({Attribute.CLASS: ObjectClass.CERTIFICATE})) # Accedemos a los certificados 
+            if not certificados: 
                 raise RuntimeError("No se encontró certificado en el DNIe.")
-            der = certificados[0][Attribute.VALUE]
-            return x509.load_der_x509_certificate(der)
-
-    # Funcion para obtener el NIF
-    def obtener_nif(self):
-        subject = self.cert.subject
-        for attr in subject:
-            if attr.oid.dotted_string == "2.5.4.5":
-                return attr.value
-        raise RuntimeError("No se encontró NIF en certificado.")
-        
-    # Funcion para obtener el nombre del DNIe
-    def obtener_nombre(self):
-        subject = self.cert.subject
-        for attr in subject:
-            if attr.oid.dotted_string == "2.5.4.3":
-                return attr.value
-        return f"usuario_{self.nif}"
+            der = certificados[0][Attribute.VALUE] # Obtiene el valor del certificado
+            return x509.load_der_x509_certificate(der) # Devuelve el certificado, gracias a la libreria x509
 
     # Funcion para calcular el hash del numero de serie del DNIe
     def obtener_hash_serial(self) -> str:
-        serial = str(self.cert.serial_number).encode('utf-8')
-        h = sha256(serial).hexdigest()[:16]
+        serial = str(self.cert.serial_number).encode('utf-8') # Obtener el número de serie(utf-8 devuelve los carácteres)
+        h = sha256(serial).hexdigest()[:16] # Calculamos el hash del número de serie y como este es el nombre de la base de datos para que no ocupe 256 cogemos los 16 primeros
         return h
 
     # Gestión de C (64 bits): Es un numero aleatorio usado para ser firmado y con ello cifrar la K_db (Clave de cifrado de la base de datos. Cada "cliente" tiene una K_db distinta)
@@ -83,12 +66,12 @@ class manejo_datos:
     def inicializar_C(self):
         if os.path.exists(self.archivo_C):
             return
-        C = os.urandom(8)  # 64 bits
+        C = os.urandom(8)  # 64 bits (8 bytes)
         with open(self.archivo_C, "wb") as f:
             f.write(C)
 
     # Funcion para leer C si ya existe
-    def leer_C(self) -> bytes:
+    def leer_C(self) -> bytes: # bytes hace que la función devuelva la información en tipo byte.
         with open(self.archivo_C, "rb") as f:
             data = f.read()
         if len(data) != 8:
@@ -98,54 +81,53 @@ class manejo_datos:
     # Firma con el DNI (S = firma_de(C))
     def firmar_con_dni(self, data: bytes) -> bytes:
         with self.token.open(user_pin=self.pin) as session:
-            keys = list(session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY}))
+            keys = list(session.get_objects({Attribute.CLASS: ObjectClass.PRIVATE_KEY})) # Encontramos donde esta la clave privada(No se puede extraer)
             if not keys:
                 raise RuntimeError("No se encontró clave privada para firmar en el token.")
-            priv = keys[0]
+            priv = keys[0] # Obtenemos la clave privada(NO EL VALOR)
             try:
-                signature = priv.sign(data, mechanism=Mechanism.SHA256_RSA_PKCS)
+                signature = priv.sign(data, mechanism=Mechanism.SHA256_RSA_PKCS) # Firmamos con la clave privada los datos
             except Exception as e:
                 try:
-                    signature = priv.sign(data)
+                    signature = priv.sign(data) # Si no puede firmar con Mechanism firma con otro método
                 except Exception as e2:
                     raise RuntimeError(f"Error al firmar con DNIe: {e2}") from e
             return signature
 
-    # k_db (clave de la Base de Datos). Cada DNI tiene su propia Clave
+    # Cada DNI tiene su propia Clave. Esta función la inicializa si no existía anteriormente
     def inicializar_kdb(self):
         if os.path.exists(self.archivo_kdb):
             return
-        k_db = os.urandom(self.AES_KEY_SIZE)
-        C = self.leer_C()
-        S = self.firmar_con_dni(C)
-        K = sha256(S).digest()
-        aesgcm = AESGCM(K)
-        nonce = os.urandom(12)
-        ct = aesgcm.encrypt(nonce, k_db, associated_data=None)
+        k_db = os.urandom(self.AES_KEY_SIZE) # Creamos k_db con el tamaño que le hemos indicado
+        C = self.leer_C() # Obtenemos C del documento
+        S = self.firmar_con_dni(C) # Firmamos C con la clave privada del dni
+        K = sha256(S).digest() # Hacemos un hash de S, es decir, de C firmado y lo devuelve en bytes 
+        aesgcm = AESGCM(K) # Utiliza el algoritmo AES GCM para cifrar por bloques con la clave K
+        nonce = os.urandom(12) # Crea un número aleatorio para aumentar la seguridad
+        ct = aesgcm.encrypt(nonce, k_db, associated_data=None) # Encripta la clave de la base de datos con el algoritmp
         with open(self.archivo_kdb, "wb") as f:
-            f.write(nonce + ct)
-        self.k_db_cache = k_db
+            f.write(nonce + ct) # Escribimos la clave más el nonce en el documento (El nonce es necesario ponerlo aparte para poder descifrar) y garantiza que no se modifique(autenticidad)
+        self.k_db_cache = k_db # Guardamos la clave en cache para no tener que cifrarla y descifrarla constantemente mientras se usa el programa(Sino iría muy lento)
 
     # Funcion para descifrar la Clave K_db
     def descifrar_kdb(self) -> bytes:
         if self.k_db_cache is not None:
-            return self.k_db_cache
+            return self.k_db_cache # Si el cache no esta vacío(No es la primera vez que se abre) no hace falta hacer todo el proceso.
         if not os.path.exists(self.archivo_kdb):
             raise RuntimeError("No existe la clave k_db cifrada para este DNI.")
         with open(self.archivo_kdb, "rb") as f:
             contenido = f.read()
-        nonce = contenido[:12]
-        ct = contenido[12:]
+        nonce = contenido[:12] # Leemos el nonce del documento
+        ct = contenido[12:] # Leemos el contendio cifrado
         C = self.leer_C()
         S = self.firmar_con_dni(C)
         K = sha256(S).digest()
         aesgcm = AESGCM(K)
-        k_db = aesgcm.decrypt(nonce, ct, associated_data=None)
-        self.k_db_cache = k_db
+        k_db = aesgcm.decrypt(nonce, ct, associated_data=None) # Desencriptado scon la clave siguiendo el proceso de inicializar_kdb
+        self.k_db_cache = k_db # Guarda en cache (La primera vez que entramos)
         return k_db
 
-    # Funciones de manejo de la Base de datos
-    # Funcion para cargar la base de datos
+    # Funcion para cargar la base de datos. Cogemos la base de datos cifrada con la k_db(NO la k) y la cargamos.
     def cargar_bd(self):
         k_db = self.descifrar_kdb()
         if not os.path.exists(self.archivo_bd):
@@ -156,39 +138,39 @@ class manejo_datos:
         ct = contenido[12:]
         aesgcm = AESGCM(k_db)
         datos_bytes = aesgcm.decrypt(nonce, ct, associated_data=None)
-        return json.loads(datos_bytes.decode("utf-8"))
+        return json.loads(datos_bytes.decode("utf-8")) 
 
-    # Funcion para guardar la Base de Datos
+    # Funcion para guardar la Base de Datos. Guardamos la base de datos cifrada nuevamente 
     def guardar_bd(self, db):
         k_db = self.descifrar_kdb()
         aesgcm = AESGCM(k_db)
         nonce = os.urandom(12)
-        ct = aesgcm.encrypt(nonce, json.dumps(db, indent=4).encode("utf-8"), associated_data=None)
+        ct = aesgcm.encrypt(nonce, json.dumps(db, indent=4).encode("utf-8"), associated_data=None) # Guarda la base de datos encriptada con un nonce y la json es legible(al ser desencriptada)
         with open(self.archivo_bd, "wb") as f:
             f.write(nonce + ct)
 
     # Funcion para agregar nuevas contraseñas
     def agregar_contraseña(self, nombre, contraseña):
         db = self.cargar_bd()
-        if any(u["nombre"] == nombre for u in db["Contrasenas"]):
+        if any(u["nombre"] == nombre for u in db["Contrasenas"]): # Si ya existe ese nombre da fallo
             return False
-        db["Contrasenas"].append({"nombre": nombre, "contrasena": contraseña})
+        db["Contrasenas"].append({"nombre": nombre, "contrasena": contraseña}) # Si el nombre es nuevo deja añadir(Se pueden repetir contraseñas)
         self.guardar_bd(db)
         return True
 
     # Funcion para editar contraseñas ya existentes
     def editar_contraseña(self, nombre_actual, nueva_contraseña):
-        if not nueva_contraseña or len(nueva_contraseña) < 15:
+        if not nueva_contraseña or len(nueva_contraseña) < 15: # Devuelve falso si no se modifica la contraseña o es insegura
             return False
-        db = self.cargar_bd()
-        for u in db["Contrasenas"]:
+        db = self.cargar_bd() # Carga la base de datos (Descifrada)
+        for u in db["Contrasenas"]: # Busca las contraseña y las edita (Antes ya ha comprobado si no es ya repetida)
             if u["nombre"] == nombre_actual:
                 u["contrasena"] = nueva_contraseña
                 self.guardar_bd(db)
                 return True
         return False
 
-    # Funcion para eliminar contraseñas
+    # Funcion para eliminar contraseñas, abre la base de datos y elimina el nombre seleccionado
     def eliminar_contraseña(self, nombre):
         db = self.cargar_bd()
         original_len = len(db["Contrasenas"])
@@ -199,7 +181,7 @@ class manejo_datos:
         else:
             return False
 
-    # Funcion para editar el nombre
+    # Funcion para editar el nombre. Permite editar el nombre si no existe devuelve falso y sino modifica la base de datos y devuelve que ha sido correcta la modificación.
     def editar_nombre(self, nombre_actual, nuevo_nombre):
         if not nuevo_nombre or not nuevo_nombre.strip():
             return False
@@ -212,6 +194,7 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
 
 
 
