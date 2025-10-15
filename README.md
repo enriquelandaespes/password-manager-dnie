@@ -60,7 +60,7 @@ pip install pygame pyscard pyperclip cryptography python-pkcs11
 Software del DNI Electrónico: Es imprescindible tener instalados los drivers oficiales del DNIe en tu sistema. Puedes descargarlos desde la web oficial del Cuerpo Nacional de Policía en el enlace (15/10/2025):
 https://www.dnielectronico.es/portaldnie/prf1_cons02.action?pag=ref_1101
 
-El programa está configurado para usar la librería opensc-pkcs11.dll. Asegúrate de que la ruta en manejo_datos.py coincida con tu instalación.
+El programa está configurado para usar la librería opensc-pkcs11.dll. Asegúrate de que la ruta en manejo_datos.py coincida con tu instalación, especialmente si el sistema operativo no es WINDOWS.
 
 —------------------------------------------------------------------------------------------------------------------
 
