@@ -5,8 +5,10 @@ Gestor de Contraseñas con DNI Electrónico (DNIe)
 Un gestor de contraseñas de escritorio seguro que utiliza las capacidades criptográficas del DNI electrónico español para el cifrado y acceso a los datos. La aplicación está desarrollada en Python con una interfaz gráfica creada con Pygame.
 
 —----------------------------------------------------------------------------------------------------------------------
+
 Características Principales
 —----------------------------------------------------------------------------------------------------------------------
+
 Máxima Seguridad con DNIe: La clave que se utiliza para cifrar la clave de la base de datos se basa en la firma de DNI electrónico por lo que es necesario para poder acceder a la base de datos
 
 Cifrado Fuerte: La base de datos está completamente cifrada utilizando el algoritmo AES-256 GCM.
