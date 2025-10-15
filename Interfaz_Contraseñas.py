@@ -86,8 +86,8 @@ def edit_entry_screen(screen, ini, entry, notify_callback):
     gui_rect = pygame.Rect(0,0,WIDTH,HEIGHT)
     gui_rect.center = screen.get_rect().center
 
-    input_nombre = InputBox((gui_rect.x+150, gui_rect.y+20,250,40), pygame.font.Font(None,28), text=entry['nombre'])
-    input_pass = InputBox((gui_rect.x+150, gui_rect.y+70,250,40), pygame.font.Font(None,28), text=entry['contrasena'])
+    input_nombre = InputBox((gui_rect.x+150, gui_rect.y+20,320,40), pygame.font.Font(None,28), text=entry['nombre'])
+    input_pass = InputBox((gui_rect.x+150, gui_rect.y+70,320,40), pygame.font.Font(None,28), text=entry['contrasena'])
     btn_aceptar = Button((gui_rect.x+150, gui_rect.y+130,120,40),"Aceptar",(25,135,84))
     btn_cancelar = Button((gui_rect.x+280, gui_rect.y+130,120,40),"Cancelar",(108,117,125))
 
@@ -330,5 +330,6 @@ def interfaz_contrasenas(ini):
         pygame.display.flip()
     pygame.quit()
     sys.exit()
+
 
 
