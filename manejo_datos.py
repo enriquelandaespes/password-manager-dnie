@@ -5,9 +5,11 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography import x509 # Sirve para leer y entender los certificados digitales del dni
 from pkcs11 import lib as pkcs11_lib, ObjectClass, Attribute # Sirve para poder interactuar con el dni
 from pkcs11 import Mechanism # Sirve para implementar el mecanismo de firma del dni (Sirve para más cosas pero en este caso lo utilizamos para firmar)
-
+# Implementamos manejo_datos como una clase para que al correr este programa se inicialice como una instancia y todas las 
+# variables críticas como pueden ser el pin o las claves no se queden registradas como variables globales.
 class manejo_datos:
-    PKCS11_LIB = r"C:\Program Files\OpenSC Project\OpenSC\pkcs11\opensc-pkcs11.dll"
+    
+    PKCS11_LIB = r"C:\Program Files\OpenSC Project\OpenSC\pkcs11\opensc-pkcs11.dll" # Donde se encuentra la librería pcks11(¡PUEDE DAR FALLO!)
     SLOT_INDEX = 0
 
     AES_KEY_SIZE = 32  # 256 bits
@@ -218,5 +220,6 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
 
 
