@@ -1,6 +1,6 @@
 # password-manager-dnie
 
-Gestor de Contraseñas con DNI Electrónico (DNIe)
+### Gestor de Contraseñas con DNI Electrónico (DNIe)
 
 Un gestor de contraseñas de escritorio seguro que utiliza las capacidades criptográficas del DNI electrónico español para el cifrado y acceso a los datos. La aplicación está desarrollada en Python con una interfaz gráfica creada con Pygame.
 
