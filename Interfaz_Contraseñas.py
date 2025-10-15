@@ -238,10 +238,16 @@ def interfaz_contrasenas(ini):
 
         for i, entry in enumerate(lista_entries):
             y_pos = i*45
+            row_rect_local = pygame.Rect(10,y_pos,WIDTH-40,40)
             pygame.draw.rect(list_surf, COLOR_ROW_BG, (10,y_pos,WIDTH-40,40), border_radius=5)
-            if list_offset[1]-scroll_y <= mouse_pos[1] <= list_offset[1]-scroll_y+40:
-                if 10 <= mouse_pos[0] <= WIDTH-30:
-                    pygame.draw.rect(list_surf, (60,65,70), (10,y_pos,WIDTH-40,40), border_radius=5)
+           
+            # 1. Calcula el rectángulo de la fila actual tal y como se ve en la pantalla
+            row_rect_screen = pygame.Rect(
+                row_rect_local.x + list_offset[0],
+                row_rect_local.y + list_offset[1] - scroll_y,
+                row_rect_local.width,
+                row_rect_local.height
+            )
             list_surf.blit(row_font.render(entry["nombre"], True, COLOR_TEXT),(20,y_pos+10))
             pass_text = entry["contrasena"] if entry["is_shown"] else "*"*12
             list_surf.blit(row_font.render(pass_text, True, COLOR_TEXT),(200,y_pos+10))
@@ -330,6 +336,7 @@ def interfaz_contrasenas(ini):
         pygame.display.flip()
     pygame.quit()
     sys.exit()
+
 
 
 
