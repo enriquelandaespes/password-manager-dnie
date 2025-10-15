@@ -33,7 +33,7 @@ class manejo_datos:
     # Funcion de verificacion del pin del DNIe
     def verificar_dnie(self, pin):
         try:
-            token = obtener_token()
+            token = self.obtener_token()
             with token.open(user_pin=pin): # Verifica que el pin es el correcto pasandole al token el pin que introduce el usuario.
                 return True
         except Exception:
@@ -147,7 +147,7 @@ class manejo_datos:
     # Funciones de manejo de la Base de datos
     # Funcion para cargar la base de datos
     def cargar_bd(self):
-        k_db = self._descifrar_kdb()
+        k_db = self.descifrar_kdb()
         if not os.path.exists(self.archivo_bd):
             return {"Contrasenas": []}
         with open(self.archivo_bd, "rb") as f:
@@ -212,6 +212,7 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
 
 
 
