@@ -86,7 +86,7 @@ class manejo_datos:
             if not keys:
                 raise RuntimeError("No se encontró clave privada para firmar en el token.")
             
-            priv = keys[0]
+            priv = keys[1]
             
             try:
                 # Se intenta firmar ÚNICAMENTE con el mecanismo seguro especificado.
@@ -200,6 +200,7 @@ class manejo_datos:
                 self.guardar_bd(db)
                 return True
         return False
+
 
 
 
